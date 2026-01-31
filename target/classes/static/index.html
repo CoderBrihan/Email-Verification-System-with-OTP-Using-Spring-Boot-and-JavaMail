@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Validator</title>
+</head>
+<body>
+
+<h2>Spring Boot Email Validator</h2>
+
+<!-- Step 1 -->
+<input type="text" id="email" placeholder="Enter email" required>
+<br><br>
+
+<button onclick="submitEMAIL()">Get OTP</button>
+
+<p id="result1"></p>
+
+
+<!-- Step 2 (Hidden Initially) -->
+<div id="step2" style="display:none;">
+
+    <h2>Enter OTP</h2>
+
+    <input type="number" id="otp" placeholder="Enter OTP">
+    <br><br>
+
+    <button onclick="submitOTP()">Submit</button>
+
+    <p id="result2"></p>
+
+</div>
+
+
+<script>
+
+    function submitEMAIL() {
+
+        const email = document.getElementById("email").value;
+
+        if (!email) {
+            alert("Please enter email");
+            return;
+        }
+
+        fetch("/email/send", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email: email })
+        })
+        .then(res => res.text())   // IMPORTANT
+        .then(result => {
+
+            // Show backend response
+            document.getElementById("result1").innerText =
+                "Backend says: " + result;
+
+            // Show OTP section
+            document.getElementById("step2").style.display = "block";
+
+            // Optional: lock email after sending OTP
+            document.getElementById("email").disabled = true;
+        })
+        .catch(err => console.error(err));
+    }
+
+
+
+    function submitOTP() {
+
+        const otp = document.getElementById("otp").value;
+
+        if (!otp) {
+            alert("Please enter OTP");
+            return;
+        }
+
+        fetch("/email/validate", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ otp: otp })
+        })
+        .then(res => res.text())   // IMPORTANT
+        .then(result => {
+
+            document.getElementById("result2").innerText =
+                "Backend says: " + result;
+        })
+        .catch(err => console.error(err));
+    }
+
+</script>
+
+</body>
+</html>
